@@ -1,12 +1,20 @@
 namespace BLOQUESONE;
 
+
+class Sucesor
+{
+    public Accion Accion { get; set; }
+    public Dictionary< Predicado , bool> Estado { get; set; }
+}
+
+
 public class Agente
 {   
     private MundoReal copiaMundo;
 
     public Agente(MundoReal mundo)
     {
-        copiaMundo = new MundoReal(mundoReal); // Copia profunda
+        copiaMundo = new MundoReal(mundo); // Copia profunda
     }
 
     private List<Sucesor> GenerarSucesores(Dictionary<string, bool> estado)
@@ -28,11 +36,12 @@ public class Agente
                     Predicado clearB = new Predicado("libre", b);
                     Predicado clearY = new Predicado("libre", y);
 
-                if (estado.ContainsKey($"on({b}, {x})") && estado[$"on({b}, {x})"] &&
-                    estado.ContainsKey($"libre({b})") && estado[$"libre({b})"] &&
-                    estado.ContainsKey($"c({y})") && estado[$"libre({y})"])
+                // 3. Verificar precondiciones usando los objetos Predicado
+                    if (estado.ContainsKey(onBX) && estado[onBX] &&    // ¿'b' está realmente sobre 'x'?
+                        estado.ContainsKey(clearB) && estado[clearB] && // ¿'b' está libre para mover?
+                        estado.ContainsKey(clearY) && estado[clearY])   // ¿'y' está libre para recibir?
                 {
-                    Tuple<string, string, string> accion = Tuple.Create(b, x, y);
+                    Accion accion = new Accion(b, x, y);
                     Dictionary<string, bool> nuevoEstado = new MundoReal(estado).AplicarAccion(accion);
                     sucesores.Add(new Sucesor { Accion = accion, Estado = nuevoEstado });
                 }

@@ -13,7 +13,7 @@ using System.Reflection;
 [assembly: System.Reflection.AssemblyCompanyAttribute("BLOQUESONE")]
 [assembly: System.Reflection.AssemblyConfigurationAttribute("Debug")]
 [assembly: System.Reflection.AssemblyFileVersionAttribute("1.0.0.0")]
-[assembly: System.Reflection.AssemblyInformationalVersionAttribute("1.0.0")]
+[assembly: System.Reflection.AssemblyInformationalVersionAttribute("1.0.0+bbf55f02ffc0f9ec1da11ad10212a223ce7a0490")]
 [assembly: System.Reflection.AssemblyProductAttribute("BLOQUESONE")]
 [assembly: System.Reflection.AssemblyTitleAttribute("BLOQUESONE")]
 [assembly: System.Reflection.AssemblyVersionAttribute("1.0.0.0")]
