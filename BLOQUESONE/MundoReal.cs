@@ -28,8 +28,9 @@ public class MundoReal
         }
     }
 
-    public Dictionary<Predicado, bool> AplicarAccion(Tuple<string, string, string> accion)
+    public Dictionary<Predicado, bool> AplicarAccion(Accion accion)
     {
+
         string bloque = accion.Item1;
         string desde = accion.Item2;
         string hacia = accion.Item3;

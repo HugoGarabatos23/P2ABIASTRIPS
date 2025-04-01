@@ -25,6 +25,8 @@ public class Predicado
         return new Predicado(partes[0].Trim(), partes.Skip(1).Select(p => p.Trim()).ToArray());
     }
 
+
+// PARA QUE FUNCIONE COMO CLAVE DICCIONARIO 
     public override bool Equals(object obj)
     {
         return obj is Predicado otro &&
