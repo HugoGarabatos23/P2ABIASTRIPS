@@ -1,0 +1,21 @@
+[Bloques]
+A, B, C
+
+[Estado Inicial]
+
+on(A, mesa) = true
+on(B, mesa) = true
+on(C, mesa) = true
+libre(A) = true
+libre(B) = true
+libre(C) = true
+
+[Estado Final]
+
+on(A, B) = true
+on(B, C) = true
+on(C, mesa) = true
+libre(A) = true
+libre(B) = false
+libre(C) = false
+

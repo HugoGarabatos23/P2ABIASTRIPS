@@ -1,0 +1,35 @@
+[Bloques]
+A, B, C, D, E, F
+
+[Posiciones]
+mesa, A, B, C, D, E, F
+
+[Estado Inicial]
+
+on(C, B) = true
+on(B, A) = true
+on(A, mesa) = true
+on(F, E) = true
+on(E, mesa) = true
+on(D, mesa) = true
+libre(C) = true
+libre(F) = true
+libre(D) = true
+libre(B) = false
+libre(A) = false
+libre(E) = false
+
+[Estado Final]
+
+on(F, E) = true
+on(E, D) = true
+on(D, C) = true
+on(C, B) = true
+on(B, A) = true
+on(A, mesa) = true
+libre(F) = true
+libre(E) = false
+libre(D) = false
+libre(C) = false
+libre(B) = false
+libre(A) = false
