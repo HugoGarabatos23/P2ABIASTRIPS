@@ -1,54 +1,106 @@
-namespace BLOQUESONE;
-
-
-class Sucesor
-{
-    public Accion Accion { get; set; }
-    public Dictionary< Predicado , bool> Estado { get; set; }
-}
-
-
 public class Agente
-{   
+{
     private MundoReal copiaMundo;
+    public string[] Bloques { get; }
+    public string[] Posiciones { get; }
 
-    public Agente(MundoReal mundo)
+    public Agente(MundoReal mundo, string[] bloques, string[] posiciones)
     {
-        copiaMundo = new MundoReal(mundo); // Copia profunda
+        copiaMundo = new MundoReal(mundo);
+        Bloques = bloques;
+        Posiciones = posiciones;
     }
 
-    private List<Sucesor> GenerarSucesores(Dictionary<string, bool> estado)
-{
-    List<Sucesor> sucesores = new List<Sucesor>();
-
-    string[] bloques = { "A", "B", "C", "D", "E", "F" };
-    string[] posiciones = { "mesa", "A", "B", "C", "D", "E", "F" };
-
-    foreach (string b in bloques)
+    private List<Sucesor> GenerarSucesores(Dictionary<Predicado, bool> estado)
     {
-        foreach (string x in posiciones)
+        List<Sucesor> sucesores = new List<Sucesor>();
+        
+        foreach (string b in Bloques)
         {
-            foreach (string y in posiciones)
+            foreach (string x in Posiciones)
             {
-                if (x == y) continue;
+                foreach (string y in Posiciones)
+                {
+                    if (x == y) continue;
 
                     Predicado onBX = new Predicado("on", b, x);
-                    Predicado clearB = new Predicado("libre", b);
-                    Predicado clearY = new Predicado("libre", y);
+                    Predicado clearB = new Predicado("clear", b);
+                    Predicado clearY = new Predicado("clear", y);
 
-                // 3. Verificar precondiciones usando los objetos Predicado
-                    if (estado.ContainsKey(onBX) && estado[onBX] &&    // ¿'b' está realmente sobre 'x'?
-                        estado.ContainsKey(clearB) && estado[clearB] && // ¿'b' está libre para mover?
-                        estado.ContainsKey(clearY) && estado[clearY])   // ¿'y' está libre para recibir?
-                {
-                    Accion accion = new Accion(b, x, y);
-                    Dictionary<string, bool> nuevoEstado = new MundoReal(estado).AplicarAccion(accion);
-                    sucesores.Add(new Sucesor { Accion = accion, Estado = nuevoEstado });
+                    if (estado.TryGetValue(onBX, out bool on) && on &&
+                        estado.TryGetValue(clearB, out bool clear1) && clear1 &&
+                        estado.TryGetValue(clearY, out bool clear2) && clear2)
+                    {
+                        Accion accion = new Accion(b, x, y);
+                        Dictionary<Predicado, bool> nuevoEstado = new MundoReal(estado).AplicarAccion(accion);
+                        sucesores.Add(new Sucesor { 
+                            Accion = accion, 
+                            Estado = nuevoEstado 
+                        });
+                    }
                 }
             }
         }
+        return sucesores;
     }
 
-    return sucesores;
+    private List<Accion> GenerarAccionesPosibles(Dictionary<Predicado, bool> estado)
+    {
+        List<Accion> accionesValidas = new List<Accion>();
+
+        foreach (string bloque in Bloques)
+        {
+            foreach (string origen in Posiciones)
+            {
+                foreach (string destino in Posiciones)
+                {
+                    if (origen == destino) continue; // No mover al mismo lugar
+
+                    // Verificar precondiciones
+                    if (EsAccionValida(estado, bloque, origen, destino))
+                    {
+                        accionesValidas.Add(new Accion(bloque, origen, destino));
+                    }
+                }
+            }
+        }
+        return accionesValidas;
+    }
+
+    private bool EsAccionValida(Dictionary<Predicado, bool> estado, string bloque, string origen, string destino)
+    {
+        Predicado onBloqueOrigen = new Predicado("on", bloque, origen);
+        Predicado clearBloque = new Predicado("clear", bloque);
+        Predicado clearDestino = new Predicado("clear", destino);
+
+        return estado.ContainsKey(onBloqueOrigen) && estado[onBloqueOrigen] && // Bloque está en el origen
+               estado.ContainsKey(clearBloque) && estado[clearBloque] &&       // Bloque no tiene nada encima
+               estado.ContainsKey(clearDestino) && estado[clearDestino];       // Destino está libre
+    }
+
+    private Dictionary<Predicado, bool> AplicarAccionGenerandoEstado(Dictionary<Predicado, bool> estadoActual, Accion accion)
+    {
+        // Crear copia profunda del estado
+        Dictionary<Predicado, bool> nuevoEstado = new Dictionary<Predicado, bool>(estadoActual);
+
+        // 1. Eliminar el predicado antiguo
+        Predicado onAntiguo = new Predicado("on", accion.Bloque, accion.Desde);
+        nuevoEstado[onAntiguo] = false;
+
+        // 2. Añadir nuevo predicado
+        Predicado onNuevo = new Predicado("on", accion.Bloque, accion.Hacia);
+        nuevoEstado[onNuevo] = true;
+
+        // 3. Actualizar clears
+        Predicado clearOrigen = new Predicado("clear", accion.Desde);
+        nuevoEstado[clearOrigen] = true;
+
+        if (accion.Hacia != "mesa")
+        {
+            Predicado clearDestino = new Predicado("clear", accion.Hacia);
+            nuevoEstado[clearDestino] = false;
+        }
+
+        return nuevoEstado;
     }
 }
