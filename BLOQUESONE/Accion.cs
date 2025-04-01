@@ -1,5 +1,5 @@
 
-namespace BLOQEUESONE;
+namespace BLOQUESONE;
 
 public class Accion
 {
