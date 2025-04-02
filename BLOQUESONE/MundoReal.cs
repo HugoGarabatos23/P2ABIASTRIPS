@@ -28,31 +28,10 @@ public class MundoReal
         }
     }
 
-    public Dictionary<Predicado, bool> AplicarAccion(Accion accion)
+    public void EjecutarAccion(Accion accion)
     {
-
-        string bloque = accion.Bloque; //Aprovechamos los ya definidos
-        string desde = accion.Desde; 
-        string hacia = accion.Hacia;
-
-        Predicado onAntes = new Predicado("on", bloque, desde);
-        Predicado onDespues = new Predicado("on", bloque, hacia);
-        Predicado clearDesde = new Predicado("clear", desde);
-        Predicado clearHacia = hacia != "mesa" ? new Predicado("clear", hacia) : null; //mesa especial no requiere estar libre 
-
-        Dictionary<Predicado, bool> nuevoEstado = new Dictionary<Predicado, bool>(Estado)
-        {
-            [onAntes] = false,
-            [onDespues] = true,
-            [clearDesde] = true
-        };
-
-        if (clearHacia != null) // Solo actualiza si no es la mesa
-        {
-            nuevoEstado[clearHacia] = false;  // El destino ya no está libre
-        }
-
-        return nuevoEstado;
+        // Usa la versión estática
+        Estado = OperacionesBloques.AplicarAccion(Estado, accion);
     }
 
     public void MostrarEstado()

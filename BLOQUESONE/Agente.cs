@@ -1,16 +1,20 @@
 namespace BLOQUESONE;
 public class Agente
 {
-
     public string[] Bloques ;
     public string[] Posiciones;
+    public List<Accion> PlanActual { get; private set; }
+    public int CostoPlan { get; private set; }
     private Dictionary<Predicado, bool> _estadoSimulado;
 
     public Agente(string[] bloques, string[] posiciones, Dictionary<Predicado, bool> estadoInicial)
     {
+        
         _estadoSimulado = CopiarEstado(estadoInicial);
         Bloques = bloques;
         Posiciones = posiciones;
+        PlanActual = new List<Accion>();
+        CostoPlan = 0;
     }
 
      // Método para generar copias seguras del estado
@@ -22,6 +26,24 @@ public class Agente
             copia.Add(new Predicado(kvp.Key.Nombre, kvp.Key.Argumentos), kvp.Value);
         }
         return copia;
+    }
+
+    public ResultadoBusqueda Planificar(Dictionary<Predicado, bool> estadoObjetivo)
+    {
+        ResultadoBusqueda resultado = BusquedaAEstrella.EncontrarSolucion(
+            _estadoSimulado,
+            estadoObjetivo,
+            estado => GenerarSucesores(estado)
+        );
+
+        PlanActual = resultado.Plan;
+        CostoPlan = resultado.CostoTotal;
+        return resultado;
+    }
+
+    private Dictionary<Predicado, bool> AplicarAccionSimulada(Accion accion)
+    {
+        return OperacionesBloques.AplicarAccion(_estadoSimulado, accion);
     }
    
     // Versión optimizada y coherente que primero valida precondiciones
@@ -56,7 +78,7 @@ public class Agente
                 if (EsMovimientoValido(estado, bloque, posicionActual, destino))
                 {
                     Accion accion = new Accion(bloque, posicionActual, destino);
-                    Dictionary<Predicado, bool> nuevoEstado = AplicarAccion(estado, accion);
+                    Dictionary<Predicado, bool> nuevoEstado = AplicarAccionSimulada(estado, accion);
                     sucesores.Add(new Sucesor {
                         Accion = accion,
                         Estado = nuevoEstado,
@@ -85,32 +107,5 @@ public class Agente
             return false;
 
         return true;
-    }
-
-    // ... (resto de métodos permanece igual)}
-    private Dictionary<Predicado, bool> AplicarAccion(Dictionary<Predicado, bool> estadoActual, Accion accion)
-    {
-        // Crear copia profunda del estado
-        Dictionary<Predicado, bool> nuevoEstado = new Dictionary<Predicado, bool>(estadoActual);
-
-        // 1. Eliminar el predicado antiguo
-        Predicado onAntiguo = new Predicado("on", accion.Bloque, accion.Desde);
-        nuevoEstado[onAntiguo] = false;
-
-        // 2. Añadir nuevo predicado
-        Predicado onNuevo = new Predicado("on", accion.Bloque, accion.Hacia);
-        nuevoEstado[onNuevo] = true;
-
-        // 3. Actualizar clears
-        Predicado clearOrigen = new Predicado("clear", accion.Desde);
-        nuevoEstado[clearOrigen] = true;
-
-        if (accion.Hacia != "mesa")
-        {
-            Predicado clearDestino = new Predicado("clear", accion.Hacia);
-            nuevoEstado[clearDestino] = false;
-        }
-
-        return nuevoEstado;
     }
 }
