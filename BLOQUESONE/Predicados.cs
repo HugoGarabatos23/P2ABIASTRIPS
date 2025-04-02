@@ -22,21 +22,20 @@ public class Predicado
         return $"{Nombre}({string.Join(", ", Argumentos)})";
     }
 
+
+    //<docstrin>
+    // Trim() elimina espacios en blanco alrededor (útil si el input es "on (A, mesa)").
+    //Select(p => p.Trim()): Aplica Trim() a cada argumento (por si hay espacios).
+    // ToArray(): Convierte el resultado en un array de strings.
     public static Predicado Parse(string input)
     {
-        tring[] partes = input.Split(new char[] { '(', ',', ')' }, StringSplitOptions.RemoveEmptyEntries);
+        string[] partes = input.Split(new char[] { '(', ',', ')' }, StringSplitOptions.RemoveEmptyEntries);
         return new Predicado(
-            partes[0].Trim(),
-            partes.Skip(1).Select(p => p.Trim()).ToArray()
+            partes[0].Trim(), // Nombre del predicado ("on")
+            partes.Skip(1).Select(p => p.Trim()).ToArray() // Argumentos (["A", "mesa"])
         );
     }
 
-
-    // PARA QUE FUNCIONE COMO CLAVE DICCIONARIO 
-    public override string ToString()
-    {
-        return $"{Nombre}({string.Join(", ", Argumentos)})";
-    }
 
     public override bool Equals(object obj)
     {

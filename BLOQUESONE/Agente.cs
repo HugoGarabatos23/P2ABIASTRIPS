@@ -1,84 +1,94 @@
+namespace BLOQUESONE;
 public class Agente
 {
-    private MundoReal copiaMundo;
-    public string[] Bloques { get; }
-    public string[] Posiciones { get; }
 
-    public Agente(MundoReal mundo, string[] bloques, string[] posiciones)
+    public string[] Bloques ;
+    public string[] Posiciones;
+    private Dictionary<Predicado, bool> _estadoSimulado;
+
+    public Agente(string[] bloques, string[] posiciones, Dictionary<Predicado, bool> estadoInicial)
     {
-        copiaMundo = new MundoReal(mundo);
+        _estadoSimulado = CopiarEstado(estadoInicial);
         Bloques = bloques;
         Posiciones = posiciones;
     }
 
+     // Método para generar copias seguras del estado
+    private Dictionary<Predicado, bool> CopiarEstado(Dictionary<Predicado, bool> original)
+    {
+        Dictionary<Predicado, bool> copia = new Dictionary<Predicado, bool>();
+        foreach (KeyValuePair<Predicado, bool> kvp in original)
+        {
+            copia.Add(new Predicado(kvp.Key.Nombre, kvp.Key.Argumentos), kvp.Value);
+        }
+        return copia;
+    }
+   
+    // Versión optimizada y coherente que primero valida precondiciones
     private List<Sucesor> GenerarSucesores(Dictionary<Predicado, bool> estado)
     {
         List<Sucesor> sucesores = new List<Sucesor>();
         
-        foreach (string b in Bloques)
+        // 1. Filtrar bloques que pueden moverse (clear=true)
+        foreach (string bloque in Bloques)
         {
-            foreach (string x in Posiciones)
+            if (!estado.GetValueOrDefault(new Predicado("clear", bloque), false))
+                continue;
+
+            // 2. Encontrar posición actual del bloque
+            string posicionActual = null;
+            foreach (string posicion in Posiciones)
             {
-                foreach (string y in Posiciones)
+                if (estado.GetValueOrDefault(new Predicado("on", bloque, posicion), false))
                 {
-                    if (x == y) continue;
+                    posicionActual = posicion;
+                    break;
+                }
+            }
+            if (posicionActual == null) continue;
 
-                    Predicado onBX = new Predicado("on", b, x);
-                    Predicado clearB = new Predicado("clear", b);
-                    Predicado clearY = new Predicado("clear", y);
-
-                    if (estado.TryGetValue(onBX, out bool on) && on &&
-                        estado.TryGetValue(clearB, out bool clear1) && clear1 &&
-                        estado.TryGetValue(clearY, out bool clear2) && clear2)
-                    {
-                        Accion accion = new Accion(b, x, y);
-                        Dictionary<Predicado, bool> nuevoEstado = new MundoReal(estado).AplicarAccion(accion);
-                        sucesores.Add(new Sucesor { 
-                            Accion = accion, 
-                            Estado = nuevoEstado 
-                        });
-                    }
+            // 3. Generar destinos válidos
+            foreach (string destino in Posiciones)
+            {
+                if (destino == posicionActual) continue;
+                
+                // Verificar precondiciones específicas para este movimiento
+                if (EsMovimientoValido(estado, bloque, posicionActual, destino))
+                {
+                    Accion accion = new Accion(bloque, posicionActual, destino);
+                    Dictionary<Predicado, bool> nuevoEstado = AplicarAccion(estado, accion);
+                    sucesores.Add(new Sucesor {
+                        Accion = accion,
+                        Estado = nuevoEstado,
+                        Costo = 1
+                    });
                 }
             }
         }
         return sucesores;
     }
 
-    private List<Accion> GenerarAccionesPosibles(Dictionary<Predicado, bool> estado)
+    // Método específico para validar movimientos
+    private bool EsMovimientoValido(Dictionary<Predicado, bool> estado, 
+                                  string bloque, string desde, string hacia)
     {
-        List<Accion> accionesValidas = new List<Accion>();
+        // 1. El bloque debe estar en la posición de origen
+        if (!estado.GetValueOrDefault(new Predicado("on", bloque, desde), false))
+            return false;
 
-        foreach (string bloque in Bloques)
-        {
-            foreach (string origen in Posiciones)
-            {
-                foreach (string destino in Posiciones)
-                {
-                    if (origen == destino) continue; // No mover al mismo lugar
+        // 2. El bloque debe estar libre (nada encima)
+        if (!estado.GetValueOrDefault(new Predicado("clear", bloque), false))
+            return false;
 
-                    // Verificar precondiciones
-                    if (EsAccionValida(estado, bloque, origen, destino))
-                    {
-                        accionesValidas.Add(new Accion(bloque, origen, destino));
-                    }
-                }
-            }
-        }
-        return accionesValidas;
+        // 3. Si el destino no es la mesa, debe estar libre
+        if (hacia != "mesa" && !estado.GetValueOrDefault(new Predicado("clear", hacia), false))
+            return false;
+
+        return true;
     }
 
-    private bool EsAccionValida(Dictionary<Predicado, bool> estado, string bloque, string origen, string destino)
-    {
-        Predicado onBloqueOrigen = new Predicado("on", bloque, origen);
-        Predicado clearBloque = new Predicado("clear", bloque);
-        Predicado clearDestino = new Predicado("clear", destino);
-
-        return estado.ContainsKey(onBloqueOrigen) && estado[onBloqueOrigen] && // Bloque está en el origen
-               estado.ContainsKey(clearBloque) && estado[clearBloque] &&       // Bloque no tiene nada encima
-               estado.ContainsKey(clearDestino) && estado[clearDestino];       // Destino está libre
-    }
-
-    private Dictionary<Predicado, bool> AplicarAccionGenerandoEstado(Dictionary<Predicado, bool> estadoActual, Accion accion)
+    // ... (resto de métodos permanece igual)}
+    private Dictionary<Predicado, bool> AplicarAccion(Dictionary<Predicado, bool> estadoActual, Accion accion)
     {
         // Crear copia profunda del estado
         Dictionary<Predicado, bool> nuevoEstado = new Dictionary<Predicado, bool>(estadoActual);

@@ -2,7 +2,7 @@ namespace BLOQUESONE;
 
 public class MundoReal
 {
-    public Dictionary<Predicado, bool> Estado { get; private set; }
+    public Dictionary<Predicado, bool> Estado { get; private set; } // para solo mutar el mundo desde aquí
 
     public MundoReal(Dictionary<Predicado, bool> estadoInicial)
     {
@@ -31,14 +31,14 @@ public class MundoReal
     public Dictionary<Predicado, bool> AplicarAccion(Accion accion)
     {
 
-        string bloque = accion.Item1;
-        string desde = accion.Item2;
-        string hacia = accion.Item3;
+        string bloque = accion.Bloque; //Aprovechamos los ya definidos
+        string desde = accion.Desde; 
+        string hacia = accion.Hacia;
 
         Predicado onAntes = new Predicado("on", bloque, desde);
         Predicado onDespues = new Predicado("on", bloque, hacia);
         Predicado clearDesde = new Predicado("clear", desde);
-        Predicado clearHacia = hacia != "mesa" ? new Predicado("clear", hacia) : null;
+        Predicado clearHacia = hacia != "mesa" ? new Predicado("clear", hacia) : null; //mesa especial no requiere estar libre 
 
         Dictionary<Predicado, bool> nuevoEstado = new Dictionary<Predicado, bool>(Estado)
         {
@@ -47,9 +47,9 @@ public class MundoReal
             [clearDesde] = true
         };
 
-        if (clearHacia != null)
+        if (clearHacia != null) // Solo actualiza si no es la mesa
         {
-            nuevoEstado[clearHacia] = false;
+            nuevoEstado[clearHacia] = false;  // El destino ya no está libre
         }
 
         return nuevoEstado;

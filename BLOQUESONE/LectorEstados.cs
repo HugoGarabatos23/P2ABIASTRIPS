@@ -1,3 +1,5 @@
+namespace BLOQUESONE;
+
 public class LectorEstados
 {
     public Dictionary<Predicado, bool> EstadoInicial { get; }
