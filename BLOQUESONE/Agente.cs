@@ -1,4 +1,5 @@
 namespace BLOQUESONE;
+
 public class Agente
 {
     public string[] Bloques ;
@@ -121,16 +122,6 @@ public class Agente
             return true;
         }
 
-        // Muestra el plan actual por consola
-        public void MostrarPlan()
-        {
-            Console.WriteLine($"=== PLAN (Costo: {CostoPlan}) ===");
-            for (int i = 0; i < PlanActual.Count; i++)
-            {
-                Console.WriteLine($"{i+1}. {PlanActual[i]}");
-            }
-        }
-
         // Muestra el estado actual del mundo
         public void MostrarEstadoActual()
         {
@@ -187,7 +178,11 @@ public class Agente
                 return;
             }
 
-            MostrarPlan(); // Muestra el plan completo primero
+            Console.WriteLine($"=== PLAN (Costo: {CostoPlan}) ===");
+            for (int i = 0; i < PlanActual.Count; i++)
+            {
+                Console.WriteLine($"{i+1}. {PlanActual[i]}");
+            } // Muestra el plan completo primero
 
             for (int i = 0; i < PlanActual.Count; i++)
             {

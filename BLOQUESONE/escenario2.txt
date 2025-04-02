@@ -12,12 +12,12 @@ on(A, mesa) = true
 on(F, E) = true
 on(E, mesa) = true
 on(D, mesa) = true
-libre(C) = true
-libre(F) = true
-libre(D) = true
-libre(B) = false
-libre(A) = false
-libre(E) = false
+clear(C) = true
+clear(F) = true
+clear(D) = true
+clear(B) = false
+clear(A) = false
+clear(E) = false
 
 [Estado Final]
 
@@ -27,9 +27,9 @@ on(D, C) = true
 on(C, B) = true
 on(B, A) = true
 on(A, mesa) = true
-libre(F) = true
-libre(E) = false
-libre(D) = false
-libre(C) = false
-libre(B) = false
-libre(A) = false
+clear(F) = true
+clear(E) = false
+clear(D) = false
+clear(C) = false
+clear(B) = false
+clear(A) = false

@@ -1,4 +1,3 @@
-
 namespace BLOQUESONE;
 
 public class Accion
@@ -13,6 +12,8 @@ public class Accion
         Desde = desde;
         Hacia = hacia;
     }
+    public override string ToString() => $"Mover({Bloque}, {Desde}, {Hacia})";
+
 }
 
 // Uso:

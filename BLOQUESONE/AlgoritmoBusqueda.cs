@@ -1,5 +1,4 @@
-namespace BLOQUESONE;
-
+namespace BLOQUESONE
 {
     public class ResultadoBusqueda
     {
@@ -13,10 +12,9 @@ namespace BLOQUESONE;
         }
     }
 
-
     public class BusquedaAEstrella
     {
-        public static List<Accion> EncontrarSolucion(
+        public static ResultadoBusqueda EncontrarSolucion(
             Dictionary<Predicado, bool> estadoInicial,
             Dictionary<Predicado, bool> estadoObjetivo,
             Func<Dictionary<Predicado, bool>, List<Sucesor>> generadorSucesores)
@@ -41,9 +39,9 @@ namespace BLOQUESONE;
                 
                 if (EsEstadoObjetivo(current.Estado, estadoObjetivo))
                 {
-                    return new ResultadoBusuqeda(
-                    plan:ReconstruirCamino(current),
-                    costo : current.G
+                    return new ResultadoBusqueda(
+                        plan: ReconstruirCamino(current),
+                        costo: current.G
                     );
                 }
 
@@ -66,7 +64,7 @@ namespace BLOQUESONE;
                         heuristica: h
                     );
 
-                    if (!cameFrom.ConstainsKey(hashSucesor) || g < cameFrom.[existente].G)
+                    if (!cameFrom.ContainsKey(hashSucesor) || g < cameFrom[hashSucesor].G)
                     {
                         cameFrom[hashSucesor] = nodoSucesor;
                         openSet.Enqueue(nodoSucesor, nodoSucesor.F);
@@ -96,8 +94,7 @@ namespace BLOQUESONE;
             {
                 if (pred.Value)
                 {
-                    bool valor;
-                    if (!estado.TryGetValue(pred.Key, out valor) || !valor)
+                    if (!estado.TryGetValue(pred.Key, out bool valor) || !valor)
                     {
                         return false;
                     }
@@ -142,7 +139,7 @@ namespace BLOQUESONE;
         public Nodo Padre { get; }
         public int G { get; } // Costo acumulado
         public int H { get; } // Heurística
-        public int F { get { return G + H; } } // Función de evaluación
+        public int F => G + H; // Función de evaluación
 
         public Nodo(
             Dictionary<Predicado, bool> estado,

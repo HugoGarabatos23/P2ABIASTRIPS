@@ -6,16 +6,16 @@ A, B, C
 on(A, mesa) = true
 on(B, mesa) = true
 on(C, mesa) = true
-libre(A) = true
-libre(B) = true
-libre(C) = true
+clear(A) = true
+clear(B) = true
+clear(C) = true
 
 [Estado Final]
 
 on(A, B) = true
 on(B, C) = true
 on(C, mesa) = true
-libre(A) = true
-libre(B) = false
-libre(C) = false
+clear(A) = true
+clear(B) = false
+clear(C) = false
 
