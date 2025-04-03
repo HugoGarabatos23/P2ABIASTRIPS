@@ -9,11 +9,21 @@ public class LectorEstados
 
     public LectorEstados(string rutaArchivo)
     {
-        var lineas = File.ReadAllLines(rutaArchivo);
-        Bloques = LeerSeccion(lineas, "[Bloques]")[0].Split(',');
-        Posiciones = LeerSeccion(lineas, "[Posiciones]")[0].Split(',');
-        EstadoInicial = ParsearEstado(LeerSeccion(lineas, "[EstadoInicial]"));
-        EstadoObjetivo = ParsearEstado(LeerSeccion(lineas, "[EstadoObjetivo]"));
+        try
+        {
+            var lineas = File.ReadAllLines(rutaArchivo).Where(l => !string.IsNullOrWhiteSpace(l)).ToArray();
+            Bloques = LeerSeccion(lineas, "[Bloques]")[0].Split(',').Select(b => b.Trim()).ToArray();
+            Posiciones = LeerSeccion(lineas, "[Posiciones]")[0].Split(',').Select(p => p.Trim()).ToArray();
+            EstadoInicial = ParsearEstado(LeerSeccion(lineas, "[EstadoInicial]"));
+            EstadoObjetivo = ParsearEstado(LeerSeccion(lineas, "[EstadoObjetivo]"));
+
+        }
+        catch (Exception ex)
+        {
+            Console.WriteLine($"El error al leer el archivo : {ex.Message}" );
+            throw;
+        }
+       
     }
 
     private List<string> LeerSeccion(string[] lineas, string seccion)
@@ -23,7 +33,10 @@ public class LectorEstados
         
         foreach (var linea in lineas)
         {
-            if (linea.Trim() == seccion)
+            
+            string lineaTrim = linea.Trim();
+            
+            if (lineaTrim == seccion)
             {
                 enSeccion = true;
                 continue;
@@ -36,6 +49,11 @@ public class LectorEstados
                     resultado.Add(linea.Trim());
             }
         }
+
+        if (resultado.Count == 0)
+            throw new InvalidDataException($"Sección '{seccion}' no encontrada o vacía");
+
+
         return resultado;
     }
 
@@ -44,7 +62,7 @@ public class LectorEstados
         var estado = new Dictionary<Predicado, bool>();
         foreach (var linea in lineas)
         {
-            var partes = linea.Split('=');
+            var partes = linea.Replace(" ", "").Split('=');
             var predicado = Predicado.Parse(partes[0]);
             bool valor = bool.Parse(partes[1]);
             estado.Add(predicado, valor);
