@@ -4,13 +4,12 @@ public class MundoReal
 {
     public Dictionary<Predicado, bool> Estado { get; private set; } // para solo mutar el mundo desde aquí
     public string[] Bloques { get; }
-    public string[] Posiciones { get; }
+    
 
-    public MundoReal(string[] bloques, string[] posiciones, Dictionary<Predicado, bool> estadoInicial)
+    public MundoReal(string[] bloques, Dictionary<Predicado, bool> estadoInicial)
     {
         Estado = new Dictionary<Predicado, bool>(estadoInicial);
         Bloques = bloques;
-        Posiciones = posiciones;
         ValidarEstadoInicial();
     }
 
@@ -94,13 +93,13 @@ public class MundoReal
         
         bool hayTorres = false;
         Console.WriteLine("\nTorres de bloques:");
-        foreach (string posicion in Posiciones.Where(p => p != "mesa"))
+        foreach (string bloque in Bloques)
         {
-            if (Estado.TryGetValue(new Predicado("on", posicion, "mesa"), out bool sobreMesa) && sobreMesa)
+            if (Estado.GetValueOrDefault(new Predicado("on",bloque,"mesa"), false))
             {
                 hayTorres = true;
-                Console.Write($"- {posicion}");
-                string actual = posicion;
+                Console.Write($"- Torre {bloque}");
+                string actual = bloque;
                 
                 string bloqueArriba;
                 while ((bloqueArriba = BuscarBloqueArriba(actual)) != null)
@@ -114,23 +113,36 @@ public class MundoReal
         if (!hayTorres) Console.WriteLine("No hay torres (todos los bloques están directamente sobre la mesa)");
 
         Console.WriteLine("\nBloques libres (clear=true):");
-        var bloquesLibres = Bloques.Where(b => Estado.GetValueOrDefault(new Predicado("clear", b), false));
-        Console.WriteLine(bloquesLibres.Any() ? string.Join(", ", bloquesLibres) : "No hay bloques libres");
-    }
+        bool hayLibres = false;
+        foreach (string bloque in Bloques)
+        {
+            if (Estado.GetValueOrDefault(new Predicado("clear", bloque), false))
+                {
+                    hayLibres = true;
+                    Console.WriteLine($"- {bloque}");
+                }
+            }
+            if (!hayLibres) Console.WriteLine("No hay bloques libres");
+        }
 
     private string BuscarBloqueArriba(string bloqueBase)
     {
-        return Estado.FirstOrDefault(
-            kvp => kvp.Key.Nombre == "on" && 
-                  kvp.Key.Argumentos[1] == bloqueBase && 
-                  kvp.Value)
-            .Key?.Argumentos[0];
+        foreach (KeyValuePair<Predicado, bool> kvp in Estado)
+        {
+            if (kvp.Key.Nombre == "on" && 
+                kvp.Key.Argumentos[1] == bloqueBase && 
+                kvp.Value)
+            {
+                return kvp.Key.Argumentos[0];
+            }
+        }
+        return null;
     }
 
     public void MostrarEstadoSimple()
     {
         Console.WriteLine("Estado actual:");
-        foreach (KeyValuePair<Predicado, bool> kvp in Estado.Where(p => p.Value))
+        foreach (KeyValuePair<Predicado, bool> kvp in Estado)
         {
             Console.WriteLine($"- {kvp.Key}");
         }

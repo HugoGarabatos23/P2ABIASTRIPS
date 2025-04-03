@@ -12,7 +12,6 @@ class Program
         // 2. Crear mundo real y agente
         MundoReal mundo = new MundoReal(
             lector.Bloques,
-            lector.Posiciones,
             lector.EstadoInicial
         );
 
@@ -22,8 +21,7 @@ class Program
         Console.WriteLine("=== PLANIFICACIÓN ===");
         var resultado = agente.Planificar(
             estadoObjetivo: lector.EstadoObjetivo,
-            bloques: lector.Bloques,
-            posiciones: lector.Posiciones
+            bloques: lector.Bloques
         );
 
         // 4. Mostrar plan

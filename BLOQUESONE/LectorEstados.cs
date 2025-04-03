@@ -5,7 +5,6 @@ public class LectorEstados
     public Dictionary<Predicado, bool> EstadoInicial { get; }
     public Dictionary<Predicado, bool> EstadoObjetivo { get; }
     public string[] Bloques { get; }
-    public string[] Posiciones { get; }
 
     public LectorEstados(string rutaArchivo)
     {
@@ -13,7 +12,6 @@ public class LectorEstados
         {
             var lineas = File.ReadAllLines(rutaArchivo).Where(l => !string.IsNullOrWhiteSpace(l)).ToArray();
             Bloques = LeerSeccion(lineas, "[Bloques]")[0].Split(',').Select(b => b.Trim()).ToArray();
-            Posiciones = LeerSeccion(lineas, "[Posiciones]")[0].Split(',').Select(p => p.Trim()).ToArray();
             EstadoInicial = ParsearEstado(LeerSeccion(lineas, "[EstadoInicial]"));
             EstadoObjetivo = ParsearEstado(LeerSeccion(lineas, "[EstadoObjetivo]"));
 

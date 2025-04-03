@@ -1,8 +1,6 @@
 [Bloques]
 A,B,C
 
-[Posiciones]
-mesa,A,B,C
 
 [EstadoInicial]
 on(A,mesa)=true

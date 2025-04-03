@@ -23,11 +23,10 @@ public class Agente
     }
 
     public ResultadoBusqueda Planificar(Dictionary<Predicado, bool> estadoObjetivo,
-    string[]bloques,
-    string[]posiciones)
+    string[]bloques)
     {
        return BusquedaAEstrella.EncontrarSolucion(_estadoSimulado, estadoObjetivo,
-        estado=> GenerarSucesores(estado,bloques,posiciones)
+        estado=> GenerarSucesores(estado,bloques)
         );
     }
 
@@ -37,7 +36,7 @@ public class Agente
     }
    
     // Versión optimizada y coherente que primero valida precondiciones
-    private List<Sucesor> GenerarSucesores(Dictionary<Predicado, bool> estado, string[]bloques, string[]posiciones)
+    private List<Sucesor> GenerarSucesores(Dictionary<Predicado, bool> estado, string[]bloques)
     {
         List<Sucesor> sucesores = new List<Sucesor>();
         
@@ -47,27 +46,27 @@ public class Agente
             if (!estado.GetValueOrDefault(new Predicado("clear", bloque), false))
                 continue;
 
-            // 2. Encontrar posición actual del bloque
-            string posicionActual = null;
-            foreach (string posicion in posiciones)
+            // 2. Encontrar base actual del bloque (puede ser mesa o otro bloque)
+            string baseActual = null;
+            foreach (string posibleBase in bloques.Concat(new[] {"mesa"}))
             {
-                if (estado.GetValueOrDefault(new Predicado("on", bloque, posicion), false))
+                if (estado.GetValueOrDefault(new Predicado("on", bloque, posibleBase), false))
                 {
-                    posicionActual = posicion;
+                    baseActual = posibleBase;
                     break;
                 }
             }
-            if (posicionActual == null) continue;
+            if (baseActual == null) continue;
 
             // 3. Generar destinos válidos
-            foreach (string destino in posiciones)
+            foreach (string destino in bloques.Concat(new[] { "mesa" }))
             {
-                if (destino == posicionActual) continue;
+                if (destino == baseActual) continue;
                 
                 // Verificar precondiciones específicas para este movimiento
-                if (EsMovimientoValido(estado, bloque, posicionActual, destino))
+                if (EsMovimientoValido(estado, bloque, baseActual, destino))
                 {
-                    Accion accion = new Accion(bloque, posicionActual, destino);
+                    Accion accion = new Accion(bloque, baseActual, destino);
                     Dictionary<Predicado, bool> nuevoEstado = AplicarAccionSimulada(estado, accion);
                     sucesores.Add(new Sucesor {
                         Accion = accion,

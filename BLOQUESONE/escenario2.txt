@@ -1,8 +1,6 @@
 [Bloques]
 A, B, C, D, E, F
 
-[Posiciones]
-mesa, A, B, C, D, E, F
 
 [EstadoInicial]
 
@@ -25,8 +23,8 @@ on(F, B) = true
 on(E, C) = true
 on(D, A) = true
 on(B, mesa) = true
-on(B, A) = true
 on(A, mesa) = true
+on(C,mesa) = true
 clear(F) = true
 clear(E) = true
 clear(D) = true
