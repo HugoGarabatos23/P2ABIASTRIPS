@@ -7,20 +7,59 @@ namespace BLOQUESONE;
 /// para alcanzar un objetivo utilizando el algoritmo A*.
 /// </summary>
 public class Agente
-{
+{   
+    private readonly MundoReal _mundo;
     public Dictionary<Predicado, bool> _estadoSimulado;
 
     // --- Constructor ---
     /// <summary>
-    /// Inicializa el agente con una copia del estado actual del mundo.
+    /// Inicializa el agente con referencia al mundo real.
     /// </summary>
     /// <param name="estadoInicial">Estado inicial del mundo (se copia para evitar modificaciones externas).</param>
-    public Agente(Dictionary<Predicado, bool> estadoInicial)
+    public Agente(MundoReal mundo)
     {
-        
-        _estadoSimulado = CopiarEstado(estadoInicial);
+        _mundo = mundo;
+        _estadoSimulado = CopiarEstado(mundo.Estado);
     }
 
+        /// <summary>
+    /// Genera y ejecuta un plan completo, mostrando cada paso por pantalla.
+    /// </summary>
+    public void GenerarYEjecutarPlan(Dictionary<Predicado, bool> estadoObjetivo, string[] bloques)
+    {
+        // 1. Mostrar estado inicial
+        Console.WriteLine("\n=== ESTADO INICIAL ===");
+        _mundo.MostrarEstado();
+
+        // 2. Generar plan (Simulación)
+        ResultadoBusqueda resultado = Planificar(estadoObjetivo, bloques);
+        
+        // 3. Mostrar plan completo
+        Console.WriteLine("\n=== PLAN GENERADO ===");
+        for (int i = 0; i < resultado.Plan.Count; i++)
+        {
+            Console.WriteLine($"{i + 1}. {resultado.Plan[i]}");
+        }
+
+         // 4. Ejecutar paso a paso
+        Console.WriteLine("\n=== EJECUCIÓN en el Mundo Real ===");
+        for (int i = 0; i < resultado.Plan.Count; i++) 
+        {
+            Accion accion = resultado.Plan[i];
+            Console.WriteLine($"\n[Paso {i + 1}/{resultado.Plan.Count}] Acción: {accion}");
+            Console.WriteLine( i == 0 ? "\nEstado INICIAL:" : "\nEstado ANTES:");
+            _mundo.MostrarEstado();
+            _mundo.EjecutarAccion(accion);
+            Console.WriteLine("\nEstado DESPUÉS:");
+            _mundo.MostrarEstado();
+
+            // Opcional: Pausa entre acciones
+            if (i < resultado.Plan.Count - 1) {
+                Console.WriteLine("Presione Enter para continuar...");
+                Console.ReadLine();
+            }
+        }
+    }
     /// <summary>
     /// Clase interna que representa un estado sucesor en el espacio de búsqueda.
     /// Solo el Agente la utiliza para generar y evaluar planes.

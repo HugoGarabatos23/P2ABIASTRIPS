@@ -3,50 +3,41 @@
 namespace BLOQUESONE;
 
 /// <summary>
-/// Clase principal que ejecuta el flujo completo de planificación y ejecución.
+/// Clase principal que ejecuta el flujo completo del programa.
 /// </summary>
 class Program
 {
-    /// Punto de entrada del programa. Coordina:
-    /// 1. Carga de escenario
-    /// 2. Creación de mundo y agente
-    /// 3. Planificación
-    /// 4. Ejecución
+    /// <summary>
+    /// Punto de entrada del programa.
+    /// Flujo: Carga → Creación → Planificación+Ejecución
     /// </summary>
     static void Main()
     {
-        // 1. Cargar estados desde el archivo
-        string ruta_archivo = "escenario2.txt";
-        LectorEstados lector = new LectorEstados(ruta_archivo);
-
-
-        // 2. Crear mundo real y agente
-        MundoReal mundo = new MundoReal(
-            lector.Bloques,
-            lector.EstadoInicial
-        );
-
-        Agente agente = new Agente(lector.EstadoInicial);
-        
-
-        // 3. Planificar
-
-        ResultadoBusqueda resultado = agente.Planificar(
-            estadoObjetivo: lector.EstadoObjetivo,
-            bloques: lector.Bloques
-        );
-    
-
-        // 4. Mostrar plan
-        Console.WriteLine("\n=== PLAN GENERADO ===");
-        foreach (Accion accion in resultado.Plan)
+        try
         {
-            Console.WriteLine(accion);
-        }
+             // 1. Cargar estados desde el archivo
+            string ruta_archivo = "escenario2.txt";
+            LectorEstados lector = new LectorEstados(ruta_archivo);
 
-        // 5. Ejecutar en mundo real
-        mundo.EjecutarPlan(resultado.Plan);
+
+            // 2. Crear mundo real y agente
+            MundoReal mundo = new MundoReal(
+                lector.Bloques,
+                lector.EstadoInicial
+            );
+
+            Agente agente = new Agente(mundo); // Inyecto mundo real en el agente
+            
+            // 3. Ejecutar flujo completo (planificación simulada + ejecución real )
+                agente.GenerarYEjecutarPlan(lector.EstadoObjetivo, lector.Bloques);
+        }
+        catch (Exception ex)
+        {
+            Console.WriteLine($"Error: {ex.Message}");
+        }
         
+        Console.WriteLine("\nPresione cualquier tecla para salir...");
+        Console.ReadKey();
     }
-          
 }
+
