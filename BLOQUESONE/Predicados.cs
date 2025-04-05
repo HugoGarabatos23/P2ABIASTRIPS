@@ -1,10 +1,31 @@
 namespace BLOQUESONE;
 
+/// <summary>
+/// Representa un predicado en el sistema de planificación STRIPS.
+/// Ejemplos: "on(A,B)", "clear(C)".
+/// </summary>
 public class Predicado
 {
+    /// <summary>
+    /// Nombre del predicado (ej: "on", "clear").
+    /// </summary>   
     public string Nombre { get; }
+
+    /// <summary>
+    /// Argumentos del predicado (ej: ["A", "B"] para "on(A,B)").
+    /// </summary>
     public string[] Argumentos { get; }
     
+    /// <summary>
+    /// Crea un nuevo predicado con validación básica de argumentos.
+    /// </summary>
+    /// <param name="nombre">Tipo de predicado ("on", "clear", etc.).</param>
+    /// <param name="argumentos">Argumentos específicos del predicado.</param>
+    /// <exception cref="ArgumentException">
+    /// Si no se cumplen las reglas: 
+    /// - "on" requiere 2 argumentos
+    /// - "clear" requiere 1 argumento
+    /// </exception>
     public Predicado(string nombre, params string[] argumentos)
     {
         if (nombre == "on" && argumentos.Length != 2)
@@ -17,16 +38,23 @@ public class Predicado
 
     }
 
+    /// <summary>
+    /// Convierte el predicado a su representación en cadena (ej: "on(A,B)").
+    /// </summary>
     public override string ToString()
     {
         return $"{Nombre}({string.Join(", ", Argumentos)})";
     }
 
 
-    //<docstrin>
-    // Trim() elimina espacios en blanco alrededor (útil si el input es "on (A, mesa)").
-    //Select(p => p.Trim()): Aplica Trim() a cada argumento (por si hay espacios).
-    // ToArray(): Convierte el resultado en un array de strings.
+    /// <summary>
+    /// Parsea una cadena en un objeto Predicado.
+    /// </summary>
+    /// <param name="input">Cadena con formato "nombre(arg1, arg2)".</param>
+    /// <returns>Nueva instancia de Predicado.</returns>
+    /// <example>
+    /// var p = Predicado.Parse("on(A, B)"); // Devuelve Predicado("on", "A", "B")
+    /// </example>
     public static Predicado Parse(string input)
     {
         string[] partes = input.Split(new char[] { '(', ',', ')' }, StringSplitOptions.RemoveEmptyEntries);
@@ -37,6 +65,10 @@ public class Predicado
     }
 
 
+    /// <summary>
+    /// Compara dos predicados por nombre y argumentos.
+    /// </summary>
+
     public override bool Equals(object obj)
     {
         return obj is Predicado otro &&
@@ -44,6 +76,10 @@ public class Predicado
             Argumentos.SequenceEqual(otro.Argumentos);
     }
 
+    /// <summary>
+    /// Genera un código hash único para el predicado.
+    /// Fundamental para usarlo como clave en Dictionary.
+    /// </summary>
     public override int GetHashCode()
     {
         int hash = 17;
