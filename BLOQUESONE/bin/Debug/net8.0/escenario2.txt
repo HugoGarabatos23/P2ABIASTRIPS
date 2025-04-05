@@ -1,7 +1,6 @@
 [Bloques]
 A, B, C, D, E, F
 
-
 [EstadoInicial]
 
 on(C, B) = true

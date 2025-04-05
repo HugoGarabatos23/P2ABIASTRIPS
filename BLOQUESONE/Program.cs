@@ -1,40 +1,52 @@
-﻿namespace BLOQUESONE;
+﻿// Hugo Garabatos Díaz y Pedro Agrelo Márquez
 
+namespace BLOQUESONE;
+
+/// <summary>
+/// Clase principal que ejecuta el flujo completo de planificación y ejecución.
+/// </summary>
 class Program
 {
+    /// Punto de entrada del programa. Coordina:
+    /// 1. Carga de escenario
+    /// 2. Creación de mundo y agente
+    /// 3. Planificación
+    /// 4. Ejecución
+    /// </summary>
     static void Main()
     {
         // 1. Cargar estados desde el archivo
-        string ruta_archivo = "escenarios_bloques.txt";
+        string ruta_archivo = "escenario2.txt";
         LectorEstados lector = new LectorEstados(ruta_archivo);
-        
-        // 2. Crear el agente con los datos leídos
-        Agente agente = new Agente(
-            bloques: lector.Bloques,
-            posiciones: lector.Posiciones,
-            estadoInicial: lector.EstadoInicial
+
+
+        // 2. Crear mundo real y agente
+        MundoReal mundo = new MundoReal(
+            lector.Bloques,
+            lector.EstadoInicial
         );
 
-        // 3. Mostrar estado inicial
-        Console.WriteLine("=== ESTADO INICIAL ===");
-        agente.MostrarEstadoActual();
+        Agente agente = new Agente(lector.EstadoInicial);
+        
 
-        // 4. Planificar para alcanzar el estado objetivo
-        Console.WriteLine("\nPlanificando...");
-        var resultado = agente.Planificar(lector.EstadoObjetivo);
+        // 3. Planificar
 
-        if (resultado.Plan.Count == 0)
+        ResultadoBusqueda resultado = agente.Planificar(
+            estadoObjetivo: lector.EstadoObjetivo,
+            bloques: lector.Bloques
+        );
+    
+
+        // 4. Mostrar plan
+        Console.WriteLine("\n=== PLAN GENERADO ===");
+        foreach (Accion accion in resultado.Plan)
         {
-            Console.WriteLine("No se encontró un plan válido.");
-            return;
+            Console.WriteLine(accion);
         }
 
-        // 5. Ejecutar el plan con visualización paso a paso
-        Console.WriteLine("\n=== EJECUTANDO PLAN ===");
-        agente.EjecutarPlanConVisualizacion(pausarEntrePasos: true);
-
-        // 6. Mostrar estado final
-        Console.WriteLine("\n=== ESTADO FINAL ===");
-        agente.MostrarEstadoActual();
+        // 5. Ejecutar en mundo real
+        mundo.EjecutarPlan(resultado.Plan);
+        
     }
+          
 }
