@@ -1,4 +1,6 @@
-﻿namespace BLOQUESONE;
+﻿// Hugo Garabatos Díaz y Pedro Agrelo Márquez
+
+namespace BLOQUESONE;
 
 /// <summary>
 /// Clase principal que ejecuta el flujo completo de planificación y ejecución.

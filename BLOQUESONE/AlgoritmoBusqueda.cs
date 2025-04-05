@@ -1,3 +1,5 @@
+// Hugo Garabatos Díaz y Pedro Agrelo Márquez
+
 namespace BLOQUESONE
 {
     /// <summary>
