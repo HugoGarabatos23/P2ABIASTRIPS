@@ -25,7 +25,7 @@ public class Agente
         /// <summary>
     /// Genera y ejecuta un plan completo, mostrando cada paso por pantalla.
     /// </summary>
-    public void GenerarYEjecutarPlan(Dictionary<Predicado, bool> estadoObjetivo, string[] bloques)
+    public void EjecutarPlan(Dictionary<Predicado, bool> estadoObjetivo, string[] bloques)
     {
         // 1. Mostrar estado inicial
         Console.WriteLine("\n=== ESTADO INICIAL ===");
@@ -49,7 +49,7 @@ public class Agente
             Console.WriteLine($"\n[Paso {i + 1}/{resultado.Plan.Count}] Acción: {accion}");
             Console.WriteLine( i == 0 ? "\nEstado INICIAL:" : "\nEstado ANTES:");
             _mundo.MostrarEstado();
-            _mundo.EjecutarAccion(accion);
+            _mundo.Estado= accion.AplicarEfectos(_mundo.Estado);
             Console.WriteLine("\nEstado DESPUÉS:");
             _mundo.MostrarEstado();
 
@@ -110,15 +110,7 @@ public class Agente
             copia.Add(new Predicado(kvp.Key.Nombre, kvp.Key.Argumentos), kvp.Value);
         }
         return copia;
-    }
-
-    /// <summary>
-    /// Aplica una acción a un estado simulado (sin modificar el estado real).
-    /// </summary>
-    private Dictionary<Predicado, bool> AplicarAccionSimulada(Dictionary<Predicado,bool>estado, Accion accion)
-    {
-        return OperacionesBloques.AplicarAccion(estado, accion);
-    }
+    }  
 
     /// <summary>
     /// Genera todos los estados sucesores válidos a partir de un estado dado.
@@ -152,12 +144,12 @@ public class Agente
             foreach (string destino in bloques.Concat(new[] { "mesa" }))
             {
                 if (destino == baseActual) continue;
-                
+
+                Accion accion = new Accion(bloque, baseActual, destino);
                 // Verificar precondiciones específicas para este movimiento
-                if (EsMovimientoValido(estado, bloque, baseActual, destino))
+                if (accion.EsAplicable(estado))
                 {
-                    Accion accion = new Accion(bloque, baseActual, destino);
-                    Dictionary<Predicado, bool> nuevoEstado = AplicarAccionSimulada(estado, accion);
+                    Dictionary<Predicado, bool> nuevoEstado = accion.AplicarEfectos(estado);
                     sucesores.Add(new Sucesor {
                         Accion = accion,
                         Estado = nuevoEstado,
@@ -168,26 +160,4 @@ public class Agente
         }
         return sucesores;
     }
-
-    /// <summary>
-    /// Valida si un movimiento cumple las precondiciones STRIPS.
-    /// </summary>
-    private bool EsMovimientoValido(Dictionary<Predicado, bool> estado, 
-                                  string bloque, string desde, string hacia)
-    {
-        // 1. El bloque debe estar en la posición de origen
-        if (!estado.GetValueOrDefault(new Predicado("on", bloque, desde), false))
-            return false;
-
-        // 2. El bloque debe estar libre (nada encima)
-        if (!estado.GetValueOrDefault(new Predicado("clear", bloque), false))
-            return false;
-
-        // 3. Si el destino no es la mesa, debe estar libre
-        if (hacia != "mesa" && !estado.GetValueOrDefault(new Predicado("clear", hacia), false))
-            return false;
-
-        return true;
-    }
-        // Muestra el estado actual del mundo
 }

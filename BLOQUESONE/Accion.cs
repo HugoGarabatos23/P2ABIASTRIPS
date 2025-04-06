@@ -41,6 +41,51 @@ public class Accion
     }
 
     /// <summary>
+    /// Verifica si esta acción es aplicable a un estado dado.
+    /// </summary>
+    public bool EsAplicable(Dictionary<Predicado, bool> estado)
+    {
+        // 1. El bloque debe estar en la posición de origen
+        bool enPosicion = estado.GetValueOrDefault(new Predicado("on", Bloque, Desde), false);
+        
+        // 2. El bloque debe estar libre (nada encima)
+        bool bloqueLibre = estado.GetValueOrDefault(new Predicado("clear", Bloque), false);
+        
+        // 3. Si el destino no es mesa, debe estar libre
+        bool destinoLibre = (Hacia == "mesa") || 
+                          estado.GetValueOrDefault(new Predicado("clear", Hacia), false);
+        
+        return enPosicion && bloqueLibre && destinoLibre;
+    }
+
+    /// <summary>
+    /// Aplica los efectos de esta acción a un estado.
+    /// </summary>
+    public Dictionary<Predicado, bool> AplicarEfectos(Dictionary<Predicado, bool> estado)
+    {
+        Dictionary<Predicado, bool> nuevoEstado = new Dictionary<Predicado, bool>(estado);
+        
+        
+        // 1. Eliminar el predicado antiguo
+        nuevoEstado[new Predicado("on", Bloque, Desde)] = false;
+        
+         // 2. Añadir nuevo predicado
+        nuevoEstado[new Predicado("on", Bloque, Hacia)] = true;
+
+        // 3. Actualizar clears
+        nuevoEstado[new Predicado("clear", Desde)] = true;
+        
+        if (Hacia != "mesa")
+        {
+            nuevoEstado[new Predicado("clear", Hacia)] = false;
+        }
+        
+        return nuevoEstado;
+    }
+
+
+
+    /// <summary>
     /// Representación en cadena de la acción en formato legible.
     /// </summary>
     /// <returns>Cadena en formato "Mover(Bloque, Desde, Hacia)".</returns>

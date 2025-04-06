@@ -29,7 +29,7 @@ class Program
             Agente agente = new Agente(mundo); // Inyecto mundo real en el agente
             
             // 3. Ejecutar flujo completo (planificación simulada + ejecución real )
-                agente.GenerarYEjecutarPlan(lector.EstadoObjetivo, lector.Bloques);
+                agente.EjecutarPlan(lector.EstadoObjetivo, lector.Bloques);
         }
         catch (Exception ex)
         {

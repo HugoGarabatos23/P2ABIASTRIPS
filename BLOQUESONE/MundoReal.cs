@@ -14,7 +14,7 @@ public class MundoReal
     /// <summary>
     /// Estado actual del mundo. Privado para garantizar modificaciones controladas.
     /// </summary>
-    public Dictionary<Predicado, bool> Estado { get; private set; } // para solo mutar el mundo desde aquí
+    public Dictionary<Predicado, bool> Estado { get; set; } // para solo mutar el mundo desde aquí
     
     /// <summary>
     /// Nombres de todos los bloques existentes en el mundo.
@@ -33,16 +33,6 @@ public class MundoReal
         Estado = new Dictionary<Predicado, bool>(estadoInicial);
         Bloques = bloques;
         ValidarEstadoInicial();
-    }
-
-
-    /// <summary>
-    /// Aplica una acción al estado actual (delega a OperacionesBloques).
-    /// </summary>
-    public void EjecutarAccion(Accion accion)
-    {
-        // Usa la versión estática
-        Estado = OperacionesBloques.AplicarAccion(Estado, accion);
     }
 
     /// <summary>
