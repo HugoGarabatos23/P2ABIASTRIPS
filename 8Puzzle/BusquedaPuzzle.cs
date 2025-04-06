@@ -57,7 +57,6 @@ namespace PUZZLE
             int[,] estadoObjetivo,
             Func<int[,], List<SucesorPuzzle>> generadorSucesores)
         {
-            // Usamos la PriorityQueue disponible en .NET 6 (si usas una versión anterior, puedes usar otra estructura).
             PriorityQueue<NodoPuzzle, int> openSet = new PriorityQueue<NodoPuzzle, int>();
             HashSet<string> closedSet = new HashSet<string>();
 
@@ -104,7 +103,7 @@ namespace PUZZLE
         }
 
         /// <summary>
-        /// Heurística: número de piezas fuera de lugar (excluyendo el espacio 0).
+        /// Heurística: número de piezas fuera de lugar (excluyendo el 0).
         /// </summary>
         public static int CalcularHeuristica(int[,] estado, int[,] objetivo)
         {

@@ -9,7 +9,6 @@ namespace PUZZLE
     {
         static void Main()
         {
-            // Leer estados desde el archivo de configuración (por ejemplo, "puzzle.txt")
             LectorEstadosPuzzle lector = new LectorEstadosPuzzle("estadopuzzle.txt");
             int[,] estadoInicial = lector.EstadoInicial;
             int[,] estadoObjetivo = lector.EstadoObjetivo;
@@ -19,7 +18,7 @@ namespace PUZZLE
             Console.WriteLine("Estado Inicial:");
             VisualizadorPuzzle.Dibujar(mundo.Tablero);
 
-            // Planificar usando la búsqueda A* definida en BusquedaPuzzle
+            // Planificar usando la búsqueda A* 
             ResultadoBusquedaPuzzle resultado = BusquedaPuzzle.EncontrarSolucion(
                 estadoInicial,
                 estadoObjetivo,
@@ -43,9 +42,10 @@ namespace PUZZLE
                 Console.Clear();
                 Console.WriteLine($"Ejecutando: {accion}");
                 VisualizadorPuzzle.Dibujar(estadoActual);
-                Thread.Sleep(1000);
+                Thread.Sleep(3000);
             }
             Console.WriteLine("¡Objetivo alcanzado!");
         }
     }
 }
+

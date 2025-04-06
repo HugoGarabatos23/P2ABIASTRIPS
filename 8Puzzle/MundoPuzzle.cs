@@ -32,8 +32,6 @@ namespace PUZZLE
         }
 
         // Método que verifica si el estado actual es el estado objetivo.
-        // Por ejemplo, para un 8-puzzle, se espera que los números estén en orden ascendente
-        // y que el espacio en blanco (0) se encuentre en la última posición.
         public bool EsEstadoObjetivo()
         {
             int filas = Tablero.GetLength(0);
