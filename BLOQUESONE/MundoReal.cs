@@ -4,14 +4,23 @@ namespace BLOQUESONE;
 
 /// <summary>
 /// Representa el mundo físico donde se ejecutan las acciones del problema de bloques.
-/// Valida estados y aplica cambios según el plan generado por STRIPS.
+/// Responsabilidades clave:
+/// 1. Mantener el estado actual (single source of truth)
+/// 2. Validar y aplicar acciones físicas
+/// 3. Mostrar el estado de forma legible
 /// </summary>
 public class MundoReal
 {
-    public Dictionary<Predicado, bool> Estado { get; private set; } // para solo mutar el mundo desde aquí
+    /// <summary>
+    /// Estado actual del mundo. Privado para garantizar modificaciones controladas.
+    /// </summary>
+    public Dictionary<Predicado, bool> Estado { get; set; } // para solo mutar el mundo desde aquí
+    
+    /// <summary>
+    /// Nombres de todos los bloques existentes en el mundo.
+    /// </summary>
     public string[] Bloques { get; }
 
-    
     
     /// <summary>
     /// Constructor: Inicializa el mundo con bloques y un estado inicial válido.
@@ -24,49 +33,6 @@ public class MundoReal
         Estado = new Dictionary<Predicado, bool>(estadoInicial);
         Bloques = bloques;
         ValidarEstadoInicial();
-    }
-
-    /// <summary>
-    /// Ejecuta un plan paso a paso, mostrando el estado antes/después de cada acción.
-    /// </summary>
-    /// <param name="plan">Lista de acciones (ej: "mover(A,B)").</param>
-    /// <param name="pausarEntrePasos">Si true, pausa para visualización interactiva.</param>
-    public void EjecutarPlan(List<Accion> plan, bool pausarEntrePasos = true)
-    {
-        if (plan.Count == 0)
-        {
-            Console.WriteLine("Plan vacío - No hay acciones a ejecutar");
-            return;
-        }
-
-        Console.WriteLine("\n=== EJECUCIÓN EN MUNDO REAL ===");
-        for (int i = 0; i < plan.Count; i++)
-        {
-            Console.WriteLine($"\n[Paso {i + 1}/{plan.Count}] Acción: {plan[i]}");
-            
-            Console.WriteLine("Estado ANTES:");
-            MostrarEstado();
-
-            EjecutarAccion(plan[i]);
-
-            Console.WriteLine("\nEstado DESPUÉS:");
-            MostrarEstado();
-
-            if (pausarEntrePasos && i < plan.Count - 1)
-            {
-                Console.WriteLine("\nPresione Enter para continuar...");
-                Console.ReadLine();
-            }
-        }
-    }
-
-    /// <summary>
-    /// Aplica una acción al estado actual (delega a OperacionesBloques).
-    /// </summary>
-    public void EjecutarAccion(Accion accion)
-    {
-        // Usa la versión estática
-        Estado = OperacionesBloques.AplicarAccion(Estado, accion);
     }
 
     /// <summary>

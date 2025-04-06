@@ -194,10 +194,11 @@ namespace BLOQUESONE
             List<Accion> camino = new List<Accion>();
             Nodo current = nodoFinal;
             
+            // Retroceder desde el nodo final hasta el inicial
             while (current.Accion != null)
             {
-                camino.Insert(0, current.Accion);
-                current = current.Padre;
+                camino.Insert(0, current.Accion); // Insertar en la posición inicial de la lista
+                current = current.Padre; // Retroceder al nodo padre
             }
             
             return camino;
